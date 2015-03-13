@@ -1,0 +1,8 @@
+This plugin enables user to draw chemical structures using Marvin JS plugin 
+and export them to TinyMce as images.
+
+Plugin uses Marvin JS from Chemaxon ltd. as a chemical drawing editor 
+to let user to draw chemical structures and then insert them into TinyMce as 
+image. These images can be later modified using the same plugin. Marvin JS is
+NOT a free software and it is NOT a part of this package. You should obtain a valid
+licence from Chemaxon ltd. http://www.chemaxon.com/products/marvin/marvin-js/
