@@ -84,31 +84,31 @@ header('X-UA-Compatible: IE=edge')
 			</td>
 		</tr>
 		<tr>
-			<td class="tdcenter"><label for="carbon_labels">{#chemeditor.carbonlabels}</label>
+			<td class="tdcenter"><label for="carbonLabelVisible">{#chemeditor.carbonlabels}</label>
 			</td>
-			<td ><input type="checkbox" id="carbon_labels" />
+			<td ><input type="checkbox" id="carbonLabelVisible" />
 			</td>
-			<td class="tdcenter"><label for="cpk_color">{#chemeditor.cpkcolor}</label>
+			<td class="tdcenter"><label for="cpkColoring">{#chemeditor.cpkcolor}</label>
 			</td>
-			<td><input type="checkbox" id="cpk_color" />
+			<td><input type="checkbox" id="cpkColoring" />
 			</td>
 			<td rowspan="4" class="tdcenter">
 				<input type="button" disabled value="{#chemeditor.pastebutton}" id="chemeditor_paste"></input>
 			</td>
 		</tr>
 		<tr>
-			<td class="tdcenter"><label for="implicit_hydrogens">{#chemeditor.implhydrogens}</label>
+			<td class="tdcenter"><label for="implicitHydrogen">{#chemeditor.implhydrogens}</label>
 			</td>
-			<td><select id="implicit_hydrogens">
+			<td><select id="implicitHydrogen">
 					<option value="ALL">{#chemeditor.implhydrogens_all}</option>
 					<option value="OFF">{#chemeditor.implhydrogens_off}</option>
 					<option value="HETERO">{#chemeditor.implhydrogens_hetero}</option>
 					<option value="TERMINAL_AND_HETERO">{#chemeditor.implhydrogens_terminalandhetero}</option>
 			</select>
 			</td>
-			<td class="tdcenter"><label for="display_mode">{#chemeditor.displaymode}</label>
+			<td class="tdcenter"><label for="displayMode">{#chemeditor.displaymode}</label>
 			</td>
-			<td><select id="display_mode">
+			<td><select id="displayMode">
 					<option value="WIREFRAME">{#chemeditor.displaymode_wireframe}</option>
 					<option value="BALLSTICK">{#chemeditor.displaymode_ballstick}</option>
 			</select>
@@ -128,23 +128,21 @@ header('X-UA-Compatible: IE=edge')
 		</tr>
 
 		<tr>
-			<td class="tdcenter"><label for="zoom_mode">{#chemeditor.zoommode}</label>
+			<td class="tdcenter"><label for="zoomMode">{#chemeditor.zoommode}</label>
 			</td>
-			<td><select id="zoom_mode">
+			<td><select id="zoomMode">
 					<option value="FIT">{#chemeditor.zoommode_fit}</option>
 					<option value="AUTOSHRINK">{#chemeditor.zoommode_autoshrink}</option>
 			</select>
 			</td>
-			<td class="tdcenter"><label for="color">{#chemeditor.color}</label>
+			<td class="tdcenter"><label for="backgroundColor">{#chemeditor.color}</label>
 			</td>
-			<td><input type="color" id="color" value="#FFFFFF" />
+			<td><input type="color" id="backgroundColor" value="#FFFFFF" />
 			</td>
 		</tr>
 	</table>
-	<script type="text/javascript"
-	src="<?php echo $marvinurl."/js/promise-0.1.1.min.js"; ?>"></script>
 <script type="text/javascript"
-	src="<?php echo $marvinurl."/js/marvinjslauncher.js"; ?>"></script>
-<script type="text/javascript" src="js/chemeditor.js"></script>
+-       src="<?php echo $marvinurl."/js/marvinjslauncher.js"; ?>"></script>
+-<script type="text/javascript" src="js/chemeditor.js"></script>
 </body>
 </html>

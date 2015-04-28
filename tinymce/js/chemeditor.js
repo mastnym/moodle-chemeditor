@@ -4,98 +4,105 @@ var marvinPackage;
 var Chemeditor = {
                 marvinSketch : null,
                 marvinPackage : null,
-
+                
                 init : function(ed) {
-                    molecule = top.tinymce.activeEditor.windowManager.params.molecule;
-
+                    var molecule = top.tinymce.activeEditor.windowManager.params.molecule;
+                    var settings = top.tinymce.activeEditor.windowManager.params.settings;
+                    var self = this;
                     tinyMCEPopup.resizeToInnerSize();
-                    // ugly hack - load event for marvinsketch iframe does not
-                    // work
-                    var interval = setInterval(function() {
-                        var iframe = document.getElementById("marvinsketch");
-                        var content = (iframe.contentWindow || iframe.contentDocument);
-                        if (content.document && content.document.getElementById("sketch")) {
-                            // expecting frame to be loaded now
-                            MarvinJSUtil.getEditor("#marvinsketch").then(function(sketcherInstance) {
-                                Chemeditor.marvinSketch = sketcherInstance;
-                                Chemeditor.marvinSketch.on("molchange", Chemeditor.molchanged);
-                                Chemeditor.settingsChanged();
-                                document.getElementById("loading_image").style.display = "none";
-                                document.getElementById("chemeditor_paste").addEventListener("click", Chemeditor.pasteMol);
 
-                            }, function(error) {
-                                alert(tinyMCEPopup.getLang('chemeditor.loaderror'));
-                            });
-                            MarvinJSUtil.getPackage("#marvinsketch").then(function(packageInstance) {
-                                Chemeditor.marvinPackage = packageInstance;
-                                // takes longer to get package which is needed
-                                // to display an image of edited molecule
-                                if (molecule != "") {
-                                    Chemeditor.marvinSketch.importAsMol(molecule);
-                                }
-
-                            }, function() {
-                                alert(tinyMCEPopup.getLang('chemeditor.loaderror'));
-                            });
-                            clearInterval(interval);
+                    MarvinJSUtil.getEditor("#marvinsketch").then(function(sketcherInstance) {
+                        self.marvinSketch = sketcherInstance;
+                        self.settingsChanged();
+                        self.marvinSketch.on("molchange", self.molchanged.bind(self), false);
+                        document.getElementById("loading_image").style.display = "none";
+                        document.getElementById("chemeditor_paste").addEventListener("click", self.pasteMol.bind(self), false);
+                        if (molecule != "") {
+                            if (settings != ""){
+                                settings = JSON.parse(settings);
+                                self.updateUI(settings);
+                                self.marvinSketch.setDisplaySettings(settings);
+                                
+                            }
+                            self.marvinSketch.importAsMol(molecule);
+                            
                         }
-                    }, 200);
+                        
+                        
+                    }, function(error) {
+                        alert(tinyMCEPopup.getLang('chemeditor.loaderror'));
+                    });
+                    MarvinJSUtil.getPackage("#marvinsketch").then(function(packageInstance) {
+                        self.marvinPackage = packageInstance;
+                    }, function() {
+                        alert(tinyMCEPopup.getLang('chemeditor.loaderror'));
+                    });
+                    
 
                 },
-                getImageURL : function(mol) {
-                    marvinSettings = {
-                                    'carbonLabelVisible' : document.getElementById("carbon_labels").checked,
-                                    'cpkColoring' : document.getElementById("cpk_color").checked,
-                                    'implicitHydrogen' : document.getElementById("implicit_hydrogens").value,
-                                    'displayMode' : document.getElementById("display_mode").value,
-                                    'background-color' : document.getElementById("color").value,
-                                    'zoomMode' : document.getElementById("zoom_mode").value,
-                                    'width' : parseInt(document.getElementById("imgwidth").value, 10),
-                                    'height' : parseInt(document.getElementById("imgheight").value, 10),
+                getCurrentSettings : function() {
+                    
+                    var marvinSettings = {
+                                    "carbonLabelVisible" : document.getElementById("carbonLabelVisible").checked,
+                                    "cpkColoring" : document.getElementById("cpkColoring").checked,
+                                    "implicitHydrogen" : document.getElementById("implicitHydrogen").value,
+                                    "displayMode" : document.getElementById("displayMode").value,
+                                    "backgroundColor" : document.getElementById("backgroundColor").value,
+                                    "zoomMode" : document.getElementById("zoomMode").value,
+                                    "width" : parseInt(document.getElementById("imgwidth").value, 10),
+                                    "height" : parseInt(document.getElementById("imgheight").value, 10),
                     };
-                    Chemeditor.marvinSketch.setDisplaySettings(marvinSettings);
-                    return Chemeditor.marvinPackage.ImageExporter.molToDataUrl(mol, "image/png", marvinSettings);
+                    return marvinSettings;
                 },
-
+                updateUI : function(settings) {
+                    for (var property in settings){
+                        if (settings.hasOwnProperty(property)){
+                            var settingWidget = document.getElementById(property);
+                            if (settingWidget != undefined){
+                                var type = settingWidget.type;
+                                if (type!="checkbox"){
+                                    settingWidget.value = settings[property];
+                                }
+                                else{
+                                    settingWidget.checked = settings[property];
+                                }
+                                
+                            }
+                        }
+                    }
+                },
                 molchanged : function() {
-                    // not ready for src export yet
-                    /*
-                     * if (marvinPackage==null){ return }
-                     */
-                    var mol = Chemeditor.marvinSketch.exportAsMol();
-                    /*
-                     * if (mol==""){
-                     * document.getElementById("chemeditor_paste").disabled=true;
-                     * return; }
-                     */
+                    var mol = this.marvinSketch.exportAsMol();
+                    var settings = this.getCurrentSettings();
+                    this.marvinSketch.setDisplaySettings(settings);
                     document.getElementById("loading_image").style.display = "inline";
                     document.getElementById("chemeditor_paste").disabled = false;
-                    var url = Chemeditor.getImageURL(mol);
+                    var url = this.marvinPackage.ImageExporter.molToDataUrl(mol, "image/png", settings);
                     document.getElementById("molimage").setAttribute("src", url);
                     document.getElementById("loading_image").style.display = "none";
                 },
 
                 settingsChanged : function() {
-                    document.getElementById("carbon_labels").addEventListener("click", Chemeditor.molchanged);
-                    document.getElementById("cpk_color").addEventListener("click", Chemeditor.molchanged);
-                    document.getElementById("implicit_hydrogens").addEventListener("change", Chemeditor.molchanged);
-                    document.getElementById("display_mode").addEventListener("change", Chemeditor.molchanged);
-                    document.getElementById("color").addEventListener("change", Chemeditor.molchanged);
-                    document.getElementById("zoom_mode").addEventListener("change", Chemeditor.molchanged);
-                    document.getElementById("imgwidth").addEventListener("change", Chemeditor.molchanged);
-                    document.getElementById("imgheight").addEventListener("change", Chemeditor.molchanged);
+                    document.getElementById("carbonLabelVisible").addEventListener("click", this.molchanged.bind(this), false);
+                    document.getElementById("cpkColoring").addEventListener("click", this.molchanged.bind(this), false);
+                    document.getElementById("implicitHydrogen").addEventListener("change", this.molchanged.bind(this), false);
+                    document.getElementById("displayMode").addEventListener("change", this.molchanged.bind(this), false);
+                    document.getElementById("backgroundColor").addEventListener("change", this.molchanged.bind(this), false);
+                    document.getElementById("zoomMode").addEventListener("change", this.molchanged.bind(this), false);
+                    document.getElementById("imgwidth").addEventListener("change", this.molchanged.bind(this), false);
+                    document.getElementById("imgheight").addEventListener("change", this.molchanged.bind(this), false);
                 },
 
                 pasteMol : function() {
                     var ed = tinyMCEPopup.editor;
-                    var mol = Chemeditor.marvinSketch.exportAsMol();
-                    var url = Chemeditor.getImageURL(mol);
+                    var mol = this.marvinSketch.exportAsMol();
+                    var url = this.marvinPackage.ImageExporter.molToDataUrl(mol, "image/png", this.getCurrentSettings());
                     var args = {
                         src : url
                     };
                     //have to add this way because of the dash in attr name
                     args["data-mol"] = mol;
-
+                    args["data-sett"] = JSON.stringify(this.marvinSketch.getDisplaySettings());
                     ed.execCommand('mceInsertContent', false, tinyMCEPopup.editor.dom.createHTML('img', args), {});
                     tinyMCEPopup.close();
                 }

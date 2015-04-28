@@ -7,8 +7,7 @@
 
                     init : function(ed, url) {
 
-                        ed.addCommand('openEditor', function(v, molecule) {
-
+                        ed.addCommand('openEditor', function(v, args) {
                             ed.windowManager.open({
                                             file : ed.getParam("moodle_plugin_base") + 'chemeditor/tinymce/editor.php',
                                             width : 1050,
@@ -16,7 +15,8 @@
                                             inline : 1
                             }, {
                                             plugin_url : url, //  /lib/editor/tinymce/plugins/loader.php/chemeditor/-1"
-                                            molecule : (molecule == undefined) ? "" : molecule
+                                            molecule : (args == undefined) ? "" : args.molecule,
+                                            settings : (args == undefined) ? "" : args.settings
                             });
 
                         });
@@ -45,10 +45,10 @@
                         ed.onDblClick.add(function(ed, e) {
                             elementClicked = e.target;
 
-                            //console.log(elementClicked.nodeName);
                             if (elementClicked.nodeName == 'IMG' && elementClicked.hasAttribute("data-mol")) {
-                                molecule = elementClicked.getAttribute("data-mol")
-                                ed.execCommand('openEditor', false, molecule);
+                                var molecule = elementClicked.getAttribute("data-mol");
+                                var settings = elementClicked.getAttribute("data-sett");
+                                ed.execCommand('openEditor', false, {molecule:molecule, settings:settings});
                             }
                         });
 
